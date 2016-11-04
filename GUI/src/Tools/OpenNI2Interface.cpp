@@ -150,8 +150,8 @@ OpenNI2Interface::OpenNI2Interface(int inWidth, int inHeight, int fps)
                 device.setDepthColorSyncEnabled(true);
                 device.setImageRegistrationMode(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
-                setAutoExposure(true);
-                setAutoWhiteBalance(true);
+               // setAutoExposure(true);
+               // setAutoWhiteBalance(true);
 
                 rgbStream.addNewFrameListener(rgbCallback);
                 depthStream.addNewFrameListener(depthCallback);
@@ -192,6 +192,7 @@ OpenNI2Interface::~OpenNI2Interface()
 
 bool OpenNI2Interface::findMode(int x, int y, int fps)
 {
+	return true;
     const openni::Array<openni::VideoMode> & depthModes = depthStream.getSensorInfo().getSupportedVideoModes();
 
     bool found = false;

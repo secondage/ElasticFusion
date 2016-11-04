@@ -15,7 +15,7 @@
  * please email researchcontracts.engineering@imperial.ac.uk.
  *
  */
-
+#define DINT
 #include "CholeskyDecomp.h"
 
 CholeskyDecomp::CholeskyDecomp()
@@ -67,26 +67,26 @@ Eigen::VectorXd CholeskyDecomp::solve(const Jacobian & jacobian, const Eigen::Ve
 
     cholmod_factor * L_factor = cholmod_copy_factor(L, &Common);
 
-    cholmod_factorize(At, L_factor, &Common);
+	cholmod_l_factorize(At, L_factor, &Common);
 
-    cholmod_change_factor(CHOLMOD_REAL, true, false, true, true, L_factor, &Common);
+    cholmod_l_change_factor(CHOLMOD_REAL, true, false, true, true, L_factor, &Common);
 
-    cholmod_dense* Arhs = cholmod_zeros(At->ncol, 1, CHOLMOD_REAL, &Common);
+    cholmod_dense* Arhs = cholmod_l_zeros(At->ncol, 1, CHOLMOD_REAL, &Common);
 
     memcpy(Arhs->x, residual.data(), At->ncol * sizeof(double));
 
-    cholmod_dense* Atb = cholmod_zeros(At->nrow, 1, CHOLMOD_REAL, &Common);
+    cholmod_dense* Atb = cholmod_l_zeros(At->nrow, 1, CHOLMOD_REAL, &Common);
 
     double alpha[2] = { 1., 0. };
     double beta[2] = { 0., 0. };
 
-    cholmod_sdmult(At, 0, alpha, beta, Arhs, Atb, &Common);
+    cholmod_l_sdmult(At, 0, alpha, beta, Arhs, Atb, &Common);
 
-    cholmod_dense* Atb_perm = cholmod_solve(CHOLMOD_P, L_factor, Atb, &Common);
+    cholmod_dense* Atb_perm = cholmod_l_solve(CHOLMOD_P, L_factor, Atb, &Common);
 
-    cholmod_dense * rhs = cholmod_solve(CHOLMOD_L, L_factor, Atb_perm, &Common);
+    cholmod_dense * rhs = cholmod_l_solve(CHOLMOD_L, L_factor, Atb_perm, &Common);
 
-    cholmod_dense* delta_cm = cholmod_solve(CHOLMOD_Lt, L_factor, rhs, &Common);
+    cholmod_dense* delta_cm = cholmod_l_solve(CHOLMOD_Lt, L_factor, rhs, &Common);
 
     Eigen::VectorXd delta(rhs->nrow);
 
@@ -95,13 +95,13 @@ Eigen::VectorXd CholeskyDecomp::solve(const Jacobian & jacobian, const Eigen::Ve
         delta(((int *)L_factor->Perm)[i]) = ((double*)delta_cm->x)[i];
     }
 
-    cholmod_free_dense(&delta_cm, &Common);
-    cholmod_free_dense(&Atb_perm, &Common);
-    cholmod_free_dense(&Atb, &Common);
-    cholmod_free_dense(&Arhs, &Common);
-    cholmod_free_sparse(&At, &Common);
-    cholmod_free_dense(&rhs, &Common);
-    cholmod_free_factor(&L_factor, &Common);
+    cholmod_l_free_dense(&delta_cm, &Common);
+    cholmod_l_free_dense(&Atb_perm, &Common);
+    cholmod_l_free_dense(&Atb, &Common);
+    cholmod_l_free_dense(&Arhs, &Common);
+    cholmod_l_free_sparse(&At, &Common);
+    cholmod_l_free_dense(&rhs, &Common);
+    cholmod_l_free_factor(&L_factor, &Common);
 
     return delta;
 }

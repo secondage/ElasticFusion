@@ -6,7 +6,7 @@
 
 #pragma once
 
-#ifndef WIN32
+#ifdef WIN32
 #  define EFUSION_API
 #else
 #  ifdef efusion_EXPORTS
